@@ -1,0 +1,32 @@
+{
+  "name": "moon-canvas",
+  "description": "This demo uses TLDraw and Liveblocks Storage, and Next.js.",
+  "license": "Apache-2.0",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@liveblocks/client": "^3.8.0",
+    "@liveblocks/node": "^3.7.1",
+    "@liveblocks/react": "^3.8.0",
+    "@liveblocks/react-ui": "^3.9.0",
+    "@types/node": "20.3.1",
+    "@types/react-dom": "^19.2.0",
+    "autoprefixer": "^10.4.17",
+    "next": "^15.5.2",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-error-boundary": "^6.0.0",
+    "tldraw": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "prettier": "^3.3.2",
+    "typescript": "^5.4.5"
+  }
+}
