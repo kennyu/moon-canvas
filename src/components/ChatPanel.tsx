@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useEditor } from "tldraw";
 import { parseShapeCommand } from "@/agent/client/parseShapeCommand";
+import { parseTransformCommand } from "@/agent/client/parseTransformCommand";
 import styles from "./ChatPanel.module.css";
 
 type Message = { id: string; role: "user" | "assistant"; text: string };
@@ -22,44 +23,116 @@ export function ChatPanel() {
     setValue("");
 
     const { hasCreateIntent, shape, color } = parseShapeCommand(text);
+    const transform = parseTransformCommand(text);
 
-    if (!hasCreateIntent) {
+    if (!hasCreateIntent && !transform.hasTransformIntent) {
       setMessages((prev) => [
         ...prev,
-        { id: `${Date.now()}-a`, role: "assistant", text: "(note) No create intent detected." },
+        { id: `${Date.now()}-a`, role: "assistant", text: "(note) No create/transform intent detected." },
       ]);
       return;
     }
 
     const viewport = editor.getViewportPageBounds();
     try {
-      const res = await fetch("/api/shape-llm", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text, viewport, shapeHint: shape }),
-      });
-      const { x, y, w, h } = await res.json();
+      if (hasCreateIntent) {
+        const res = await fetch("/api/shape-llm", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text, viewport, shapeHint: shape }),
+        });
+        const { x, y, w, h } = await res.json();
 
-      const isCircle = shape === "circle";
-      const size = isCircle ? Math.min(w, h) : null;
-      const geo = isCircle ? "ellipse" : shape;
+        const isCircle = shape === "circle";
+        const size = isCircle ? Math.min(w, h) : null;
+        const geo = isCircle ? "ellipse" : shape;
+        const finalW = size ?? w;
+        const finalH = size ?? h;
 
-      editor.createShape({
-        type: "geo",
-        x,
-        y,
-        props: { geo, w: size ?? w, h: size ?? h, color },
-      } as any);
+        editor.createShape({
+          type: "geo",
+          x,
+          y,
+          props: { geo, w: finalW, h: finalH, color },
+        } as any);
 
-      setMessages((prev) => [
-        ...prev,
-        { id: `${Date.now()}-a`, role: "assistant", text: `Created ${shape} in ${color}.` },
-      ]);
-      listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `${Date.now()}-a`,
+            role: "assistant",
+            text: `Created ${shape} in ${color} at (${x}, ${y}) size ${finalW}x${finalH}.`,
+          },
+        ]);
+        listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
+      }
+
+      if (transform.hasTransformIntent) {
+        const all = editor.getCurrentPageShapes();
+        const vp = editor.getViewportPageBounds();
+        const shapes = all
+          .map((s: any) => {
+            const b = editor.getShapePageBounds(s.id);
+            if (!b) return null;
+            const intersects = !(b.x + b.w < vp.x || b.y + b.h < vp.y || b.x > vp.x + vp.w || b.y > vp.y + vp.h);
+            if (!intersects) return null;
+            return {
+              id: s.id,
+              type: s.type,
+              geo: s.props?.geo,
+              color: s.props?.color,
+              text: s.props?.text,
+              rotation: (s as any).rotation,
+              bounds: { x: b.x, y: b.y, w: b.w, h: b.h },
+            };
+          })
+          .filter(Boolean);
+
+        const res2 = await fetch("/api/shape-llm/transform", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: text,
+            viewport,
+            hints: { action: transform.action, shape: transform.shapeHint, color: transform.colorHint },
+            shapes,
+          }),
+        });
+        const data = await res2.json();
+
+        if (data?.shapeId && data?.action) {
+          if (data.action === "move" && data.move?.to) {
+            editor.updateShape({ id: data.shapeId, x: data.move.to.x, y: data.move.to.y } as any);
+            setMessages((prev) => [
+              ...prev,
+              { id: `${Date.now()}-t`, role: "assistant", text: `Moved ${data.shapeId} to (${data.move.to.x}, ${data.move.to.y}).` },
+            ]);
+          } else if (data.action === "resize" && data.resize?.to) {
+            editor.updateShape({ id: data.shapeId, type: "geo", props: { w: data.resize.to.w, h: data.resize.to.h } } as any);
+            setMessages((prev) => [
+              ...prev,
+              { id: `${Date.now()}-t`, role: "assistant", text: `Resized ${data.shapeId} to ${data.resize.to.w}x${data.resize.to.h}.` },
+            ]);
+          } else if (data.action === "rotate" && data.rotate) {
+            const deg = data.rotate.to ?? data.rotate.by ?? 0;
+            const radians = (data.rotate.unit === "rad" ? deg : (deg * Math.PI) / 180) as number;
+            editor.updateShape({ id: data.shapeId, rotation: radians } as any);
+            setMessages((prev) => [
+              ...prev,
+              { id: `${Date.now()}-t`, role: "assistant", text: `Rotated ${data.shapeId} by ${Math.round((radians * 180) / Math.PI)}°.` },
+            ]);
+          }
+        } else {
+          setMessages((prev) => [
+            ...prev,
+            { id: `${Date.now()}-t`, role: "assistant", text: "(note) No applicable transform returned." },
+          ]);
+        }
+      }
     } catch (e) {
       setMessages((prev) => [
         ...prev,
-        { id: `${Date.now()}-a`, role: "assistant", text: "(error) Failed to place shape." },
+        { id: `${Date.now()}-a`, role: "assistant", text: "(error) Failed to process command." },
       ]);
     }
   }, [value, editor]);

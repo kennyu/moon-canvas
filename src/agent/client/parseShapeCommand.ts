@@ -1,42 +1,8 @@
 "use client";
 
-export type ParsedShape = "rectangle" | "ellipse" | "triangle" | "diamond" | "circle";
-export type ParsedColor =
-  | "black"
-  | "grey"
-  | "red"
-  | "orange"
-  | "yellow"
-  | "green"
-  | "teal"
-  | "blue"
-  | "indigo"
-  | "violet"
-  | "pink"
-  | "white";
+import { COLOR_ALIASES, type ParsedColor } from "@/agent/client/colors";
 
-const COLOR_ALIASES: Record<string, ParsedColor> = {
-  black: "black",
-  grey: "grey",
-  gray: "grey",
-  silver: "grey",
-  red: "red",
-  orange: "orange",
-  yellow: "yellow",
-  green: "green",
-  teal: "teal",
-  cyan: "teal",
-  turquoise: "teal",
-  blue: "blue",
-  indigo: "indigo",
-  navy: "indigo",
-  violet: "violet",
-  purple: "violet",
-  pink: "pink",
-  white: "white",
-  ivory: "white",
-  "off-white": "white",
-};
+export type ParsedShape = "rectangle" | "ellipse" | "triangle" | "diamond" | "circle";
 
 export function parseShapeCommand(input: string): {
   hasCreateIntent: boolean;
