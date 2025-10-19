@@ -75,10 +75,11 @@ export async function POST(req: NextRequest) {
       "You are a UI assistant that picks a shape position and size in a 2D canvas viewport.",
       "Given a user message, a viewport {x,y,w,h}, and an optional shape hint (like 'circle' or 'rectangle'), return ONLY strict JSON with keys x,y,w,h.",
       "Rules:",
-      "- x,y must be in the viewport's coordinate space.",
-      "- w,h must be positive and reasonably sized for the viewport.",
+      "- x,y must be in the viewport's coordinate space and may be specified from user message",
+      "- w,h must be positive and reasonably sized for the viewport and may be specified from user message",
       "- If shapeHint is 'circle', try to make w and h similar.",
-      "Output example: {\"x\":120,\"y\":80,\"w\":200,\"h\":120}.",
+      "Input example: \"Create a circle at (100, 100) with a radius of 50\"",
+      "Output example: {\"x\":100,\"y\":100,\"w\":100,\"h\":100}.",
     ].join("\n");
 
     const user = JSON.stringify({ message, viewport, shapeHint });
@@ -86,7 +87,7 @@ export async function POST(req: NextRequest) {
     let placement = centerDefault(viewport, shapeHint);
     try {
       const res = await openai.chat.completions.create({
-        model: "gpt-5-nano",
+        model: "gpt-5-mini",
         messages: [
           { role: "system", content: prompt },
           { role: "user", content: user },
