@@ -6,11 +6,6 @@ import { useStorageStore } from "./useStorageStore";
 import { useSelf } from "@liveblocks/react/suspense";
 import { Avatars } from "@/components/Avatars";
 
-/**
- * IMPORTANT: LICENSE REQUIRED
- * To remove the watermark, you must first purchase a license
- * Learn more: https://tldraw.dev/community/license
- */
 
 export function StorageTldraw() {
   // Getting authenticated user info. Doing this using selectors instead
@@ -21,12 +16,12 @@ export function StorageTldraw() {
   const store = useStorageStore({
     user: { id, color: info.color, name: info.name },
   });
-
+  const licenseKey = process.env.TLDRAW_KEY;
   return (
     <div style={{ height: "100vh", width: "100vw" }}>
       <Tldraw
         store={store}
-        licenseKey={process.env.TLDRAW_KEY}
+        licenseKey={licenseKey}
         components={{
           // Render a live avatar stack at the top-right
           StylePanel: () => (
