@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useMemo, useRef, useState } from "react";
+import { useEditor } from "tldraw";
+import { parseShapeCommand } from "@/agent/client/parseShapeCommand";
 import styles from "./ChatPanel.module.css";
 
 type Message = { id: string; role: "user" | "assistant"; text: string };
@@ -9,23 +11,58 @@ export function ChatPanel() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [value, setValue] = useState("");
   const listRef = useRef<HTMLDivElement | null>(null);
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
+  const editor = useEditor();
 
-  const onSend = useCallback(() => {
+  const onSend = useCallback(async () => {
     const text = value.trim();
     if (!text) return;
     const msg: Message = { id: `${Date.now()}`, role: "user", text };
     setMessages((prev) => [...prev, msg]);
     setValue("");
-    // TODO: wire to agent backend, append assistant reply
-    setTimeout(() => {
+
+    const { hasCreateIntent, shape, color } = parseShapeCommand(text);
+
+    if (!hasCreateIntent) {
       setMessages((prev) => [
         ...prev,
-        { id: `${Date.now()}-a`, role: "assistant", text: "(stub) Received." },
+        { id: `${Date.now()}-a`, role: "assistant", text: "(note) No create intent detected." },
+      ]);
+      return;
+    }
+
+    const viewport = editor.getViewportPageBounds();
+    try {
+      const res = await fetch("/api/shape-llm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text, viewport, shapeHint: shape }),
+      });
+      const { x, y, w, h } = await res.json();
+
+      const isCircle = shape === "circle";
+      const size = isCircle ? Math.min(w, h) : null;
+      const geo = isCircle ? "ellipse" : shape;
+
+      editor.createShape({
+        type: "geo",
+        x,
+        y,
+        props: { geo, w: size ?? w, h: size ?? h, color },
+      } as any);
+
+      setMessages((prev) => [
+        ...prev,
+        { id: `${Date.now()}-a`, role: "assistant", text: `Created ${shape} in ${color}.` },
       ]);
       listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
-    }, 250);
-  }, [value]);
+    } catch (e) {
+      setMessages((prev) => [
+        ...prev,
+        { id: `${Date.now()}-a`, role: "assistant", text: "(error) Failed to place shape." },
+      ]);
+    }
+  }, [value, editor]);
 
   const onKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -61,7 +98,13 @@ export function ChatPanel() {
               placeholder="Message the agent..."
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              onKeyDown={onKeyDown}
+              onKeyDown={(e) => {
+                e.stopPropagation();
+                if (e.nativeEvent) {
+                  e.nativeEvent.stopImmediatePropagation?.();
+                }
+                onKeyDown(e);
+              }}
             />
             <button className={styles.sendBtn} onClick={onSend}>Send</button>
           </div>

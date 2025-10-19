@@ -40,8 +40,8 @@ export function StorageTldraw() {
         }}
         autoFocus
       >
+        <ChatPanel />
       </Tldraw>
-      <ChatPanel />
     </div>
   );
 }
