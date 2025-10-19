@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
 
     // Ask the model for a placement. We keep the prompt short and require strict JSON.
     const prompt = [
-      "You are a UI assistant that picks a rectangle position and size in a 2D canvas viewport.",
+      "You are a UI assistant that picks a shape position and size in a 2D canvas viewport.",
       "Given a user message, a viewport {x,y,w,h}, and an optional shape hint (like 'circle' or 'rectangle'), return ONLY strict JSON with keys x,y,w,h.",
       "Rules:",
       "- x,y must be in the viewport's coordinate space.",
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
     let placement = centerDefault(viewport, shapeHint);
     try {
       const res = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: "gpt-5-nano",
         messages: [
           { role: "system", content: prompt },
           { role: "user", content: user },
