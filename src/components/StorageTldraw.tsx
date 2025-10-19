@@ -17,12 +17,11 @@ export function StorageTldraw() {
     user: { id, color: info.color, name: info.name },
   });
 
-  const licenseKey = process.env.TLDRAW_KEY;
   return (
     <div style={{ height: "100vh", width: "100vw", position: "relative" }}>
       <Tldraw
         store={store}
-        licenseKey={licenseKey}
+        licenseKey='tldraw-2026-01-26/WyJyWDUwamVOXyIsWyIqIl0sMTYsIjIwMjYtMDEtMjYiXQ.EZYgRowORj0sAqbigsc9bwZi2olTsFzAlzlwyh44FwSNbvj0mpGjz1jTfyHq3Ln5ZCfAEXzYj/TR9woNE8pWBQ'
         components={{
           // Render a live avatar stack at the top-right
           StylePanel: () => (

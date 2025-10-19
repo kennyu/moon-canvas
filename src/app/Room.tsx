@@ -8,7 +8,7 @@ import { Loading } from "@/components/Loading";
 
 export function Room({ children }: { children: ReactNode }) {
   const roomId = useExampleRoomId(
-    "liveblocks:examples:nextjs-tldraw-whiteboard-storage"
+    "liveblocks:examples:whiteboard-storage"
   );
 
   return (
