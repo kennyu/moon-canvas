@@ -36,7 +36,7 @@ export function ChatPanel() {
     const viewport = editor.getViewportPageBounds();
     try {
       if (hasCreateIntent) {
-        const res = await fetch("/api/shape-llm", {
+        const res = await fetch("/api/canvas-agent", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: text, viewport, shapeHint: shape }),
@@ -88,7 +88,7 @@ export function ChatPanel() {
           })
           .filter(Boolean);
 
-        const res2 = await fetch("/api/shape-llm/transform", {
+        const res2 = await fetch("/api/canvas-agent/transform", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

@@ -27,7 +27,7 @@ test.describe('parser: transform intent', () => {
   });
 });
 
-test.describe('integration: /api/shape-llm/transform', () => {
+test.describe('integration: /api/canvas-agent/transform', () => {
   test('move: chooses blue rectangle and returns move object', async ({ request, baseURL }) => {
     const shapes = [
       { id: 'a1', type: 'geo', geo: 'rectangle', color: 'blue', bounds: { x: 100, y: 100, w: 200, h: 120 } },
@@ -35,7 +35,7 @@ test.describe('integration: /api/shape-llm/transform', () => {
     ];
     const message = 'Move the blue rectangle to the center';
     const hints = parseTransformCommand(message);
-    const res = await request.post(`${baseURL}/api/shape-llm/transform`, {
+    const res = await request.post(`${baseURL}/api/canvas-agent/transform`, {
       data: { message, viewport, hints: { action: hints.action, shape: hints.shapeHint, color: hints.colorHint }, shapes },
     });
     expect(res.ok()).toBeTruthy();
@@ -61,7 +61,7 @@ test.describe('integration: /api/shape-llm/transform', () => {
     ];
     const message = 'Resize the circle to be twice as big';
     const hints = parseTransformCommand(message);
-    const res = await request.post(`${baseURL}/api/shape-llm/transform`, {
+    const res = await request.post(`${baseURL}/api/canvas-agent/transform`, {
       data: { message, viewport, hints: { action: hints.action, shape: hints.shapeHint, color: hints.colorHint }, shapes },
     });
     expect(res.ok()).toBeTruthy();
@@ -80,7 +80,7 @@ test.describe('integration: /api/shape-llm/transform', () => {
     ];
     const message = 'Rotate the text 45 degrees';
     const hints = parseTransformCommand(message);
-    const res = await request.post(`${baseURL}/api/shape-llm/transform`, {
+    const res = await request.post(`${baseURL}/api/canvas-agent/transform`, {
       data: { message, viewport, hints: { action: hints.action, shape: hints.shapeHint, color: hints.colorHint }, shapes },
     });
     expect(res.ok()).toBeTruthy();
