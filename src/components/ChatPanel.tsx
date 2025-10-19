@@ -36,7 +36,7 @@ export function ChatPanel() {
     const viewport = editor.getViewportPageBounds();
     try {
       if (hasCreateIntent) {
-        const res = await fetch("/api/canvas-agent", {
+        const res = await fetch("/api/canvas-agent/create", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: text, viewport, shapeHint: shape }),
