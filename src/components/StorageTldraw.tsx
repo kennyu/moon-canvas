@@ -31,8 +31,8 @@ export function StorageTldraw() {
                 marginTop: 4,
               }}
             >
-              <Avatars />
               <DefaultStylePanel />
+              <Avatars />
             </div>
           ),
           PageMenu: null,
@@ -43,18 +43,16 @@ export function StorageTldraw() {
                 top: 8,
                 left: "50%",
                 transform: "translateX(-50%)",
-                display: "flex",
-                flexDirection: "column",
+                display: "flex-column",
                 alignItems: "center",
-                gap: 8,
+                gap: 4,
                 zIndex: 10,
                 pointerEvents: "auto",
               }}
             >
               <DefaultToolbar />
-              <div style={{ width: "min(720px, 90vw)" }}>
-                <ChatPanel />
-              </div>
+              <ChatPanel />
+              
             </div>
           ),
         }}

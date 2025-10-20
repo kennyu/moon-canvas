@@ -108,13 +108,13 @@ Building Real-Time Collaborative Design Tools with AI
 
 **Layout Commands (at least 1 required):**
 - [ ] "Arrange these shapes in a horizontal row"
-- [ ] "Create a grid of 3x3 squares"
 - [ ] "Space these elements evenly"
 
 **Complex Commands (at least 1 required):**
 - [ ] "Create a login form with username and password fields"
 - [ ] "Build a navigation bar with 4 menu items"
 - [ ] "Make a card layout with title, image, and description"
+- [ ] "Create a grid of 3x3 squares"
 
 #### Complex Command Execution (8 points)
 - [ ] "Create login form" produces 3+ properly arranged elements
