@@ -1,8 +1,11 @@
 "use client";
 
 import { signOut, useSession } from "next-auth/react";
+import type { FC } from "react";
 
-export default function AuthBar() {
+type AuthBarProps = { inline?: boolean };
+
+const AuthBar: FC<AuthBarProps> = ({ inline = false }) => {
   const { data: session } = useSession();
 
   if (!session) return null;
@@ -10,17 +13,18 @@ export default function AuthBar() {
   return (
     <div
       style={{
-        position: "fixed",
-        top: 12,
-        right: 12,
+        position: inline ? "static" : "fixed",
+        top: inline ? undefined : 12,
+        right: inline ? undefined : 12,
         display: "flex",
         alignItems: "center",
         gap: 8,
         background: "rgba(0,0,0,0.6)",
         color: "white",
-        padding: "6px 10px",
+        padding: inline ? "4px 8px" : "6px 10px",
         borderRadius: 8,
-        zIndex: 1000,
+        zIndex: inline ? 100 : 1000,
+        pointerEvents: "auto",
       }}
     >
       {session.user?.image && (
@@ -50,6 +54,8 @@ export default function AuthBar() {
       </button>
     </div>
   );
-}
+};
+
+export default AuthBar;
 
 
