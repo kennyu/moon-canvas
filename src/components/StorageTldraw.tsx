@@ -1,7 +1,7 @@
 "use client";
 
 import "tldraw/tldraw.css";
-import { Tldraw, DefaultStylePanel, DefaultStylePanelContent } from "tldraw";
+import { Tldraw, DefaultStylePanel, DefaultToolbar } from "tldraw";
 import { useStorageStore } from "./useStorageStore";
 import { useSelf } from "@liveblocks/react/suspense";
 import { Avatars } from "@/components/Avatars";
@@ -36,11 +36,30 @@ export function StorageTldraw() {
             </div>
           ),
           PageMenu: null,
+          Toolbar: () => (
+            <div
+              style={{
+                position: "absolute",
+                top: 8,
+                left: "50%",
+                transform: "translateX(-50%)",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 8,
+                zIndex: 10,
+                pointerEvents: "auto",
+              }}
+            >
+              <DefaultToolbar />
+              <div style={{ width: "min(720px, 90vw)" }}>
+                <ChatPanel />
+              </div>
+            </div>
+          ),
         }}
         autoFocus
-      >
-        <ChatPanel />
-      </Tldraw>
+      />
     </div>
   );
 }
