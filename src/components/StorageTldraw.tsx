@@ -6,6 +6,7 @@ import { useStorageStore } from "./useStorageStore";
 import { useSelf } from "@liveblocks/react/suspense";
 import { Avatars } from "@/components/Avatars";
 import { ChatPanel } from "@/components/ChatPanel";
+import { PresencePanel } from "@/components/PresencePanel";
 
 export function StorageTldraw() {
   // Getting authenticated user info. Doing this using selectors instead
@@ -32,7 +33,7 @@ export function StorageTldraw() {
               }}
             >
               <DefaultStylePanel />
-              <Avatars />
+              <PresencePanel />
             </div>
           ),
           PageMenu: null,
