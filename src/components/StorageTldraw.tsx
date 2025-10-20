@@ -4,9 +4,9 @@ import "tldraw/tldraw.css";
 import { Tldraw, DefaultStylePanel, DefaultToolbar } from "tldraw";
 import { useStorageStore } from "./useStorageStore";
 import { useSelf } from "@liveblocks/react/suspense";
-import { Avatars } from "@/components/Avatars";
 import { ChatPanel } from "@/components/ChatPanel";
 import { PresencePanel } from "@/components/PresencePanel";
+import AuthBar from "@/components/AuthBar";
 
 export function StorageTldraw() {
   // Getting authenticated user info. Doing this using selectors instead
@@ -30,8 +30,12 @@ export function StorageTldraw() {
               style={{
                 display: "flex-column",
                 marginTop: 4,
+                pointerEvents: "auto",
               }}
             >
+              <div style={{ marginBottom: 6, pointerEvents: "auto", zIndex: 100 }}>
+                <AuthBar inline />
+              </div>
               <DefaultStylePanel />
               <PresencePanel />
             </div>
