@@ -4,6 +4,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { useEditor } from "tldraw";
 import { parseShapeCommand } from "@/agent/client/parseShapeCommand";
 import { parseTransformCommand } from "@/agent/client/parseTransformCommand";
+import { parseLayoutCommand } from "@/agent/client/parseLayoutCommand";
 import styles from "./ChatPanel.module.css";
 
 type Message = { id: string; role: "user" | "assistant"; text: string };
@@ -24,8 +25,9 @@ export function ChatPanel() {
 
     const { hasCreateIntent, shape, color } = parseShapeCommand(text);
     const transform = parseTransformCommand(text);
+    const layout = parseLayoutCommand(text);
 
-    if (!hasCreateIntent && !transform.hasTransformIntent) {
+    if (!hasCreateIntent && !transform.hasTransformIntent && !layout.hasLayoutIntent) {
       setMessages((prev) => [
         ...prev,
         { id: `${Date.now()}-a`, role: "assistant", text: "(note) No create/transform intent detected." },
@@ -126,6 +128,48 @@ export function ChatPanel() {
           setMessages((prev) => [
             ...prev,
             { id: `${Date.now()}-t`, role: "assistant", text: "(note) No applicable transform returned." },
+          ]);
+        }
+      }
+
+      if (layout.hasLayoutIntent) {
+        const all = editor.getCurrentPageShapes();
+        const vp = editor.getViewportPageBounds();
+        const shapes = all
+          .map((s: any) => {
+            const b = editor.getShapePageBounds(s.id);
+            if (!b) return null;
+            const intersects = !(b.x + b.w < vp.x || b.y + b.h < vp.y || b.x > vp.x + vp.w || b.y > vp.y + vp.h);
+            if (!intersects) return null;
+            return { id: s.id, type: s.type, bounds: { x: b.x, y: b.y, w: b.w, h: b.h } };
+          })
+          .filter(Boolean);
+        const selection = editor.getSelectedShapeIds?.() ?? [];
+
+        const res3 = await fetch("/api/canvas-agent/layout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: text,
+            viewport,
+            hints: { axis: layout.axis, distribute: layout.distribute, align: layout.align, gapPx: layout.gapPx, target: layout.target },
+            shapes,
+            selectionIds: selection,
+          }),
+        });
+        const data3 = await res3.json();
+        if (Array.isArray(data3?.moves)) {
+          for (const mv of data3.moves) {
+            editor.updateShape({ id: mv.id, x: mv.to.x, y: mv.to.y } as any);
+          }
+          setMessages((prev) => [
+            ...prev,
+            { id: `${Date.now()}-l`, role: "assistant", text: `Laid out ${data3.moves.length} shapes${layout.axis ? ` in a ${layout.axis}` : ""}${layout.distribute ? " evenly" : ""}.` },
+          ]);
+        } else {
+          setMessages((prev) => [
+            ...prev,
+            { id: `${Date.now()}-l`, role: "assistant", text: "(note) No layout changes returned." },
           ]);
         }
       }
