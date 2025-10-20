@@ -26,7 +26,11 @@ export async function POST() {
 
   const color = pickColor(user.id);
   const lbSession = liveblocks.prepareSession(user.id, {
-    userInfo: { name: user.name, avatar: user.avatar, color },
+    userInfo: {
+      name: user.name,
+      color,
+      ...(user.avatar ? { avatar: user.avatar } : {}),
+    },
   });
   lbSession.allow(`liveblocks:examples:*`, lbSession.FULL_ACCESS);
   const { body, status } = await lbSession.authorize();
