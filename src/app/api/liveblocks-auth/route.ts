@@ -1,27 +1,35 @@
 import { Liveblocks } from "@liveblocks/node";
-import { NextRequest } from "next/server";
-import { getRandomUser } from "@/database";
-
+import { getServerSession } from "next-auth";
+import { cookies } from "next/headers";
+import { authOptions } from "@/app/auth";
+import { pickColor } from "@/lib/userColor";
 
 const liveblocks = new Liveblocks({
   secret: process.env.LIVEBLOCKS_SECRET_KEY as string,
 });
 
-export async function POST(request: NextRequest) {
-  // Get the current user's unique id and info from your database
-  const user = getRandomUser();
+export async function POST() {
+  const session = await getServerSession(authOptions);
+  const cookieStore = await cookies();
+  const guestId = cookieStore.get("guestId")?.value;
+  const guestName = cookieStore.get("guestName")?.value;
 
-  // Create a session for the current user
-  // userInfo is made available in Liveblocks presence hooks, e.g. useOthers
-  const session = liveblocks.prepareSession(`${user.id}`, {
-    userInfo: user.info,
+  const user = session?.user
+    ? {
+        id: (session.user.email || session.user.name || "user") as string,
+        name: (session.user.name || "User") as string,
+        avatar: session.user.image || undefined,
+      }
+    : guestId && guestName
+    ? { id: `guest:${guestId}` as string, name: guestName as string }
+    : { id: `guest:${crypto.randomUUID()}`, name: "Guest" };
+
+  const color = pickColor(user.id);
+  const lbSession = liveblocks.prepareSession(user.id, {
+    userInfo: { name: user.name, avatar: user.avatar, color },
   });
-
-  // Use a naming pattern to allow access to rooms with a wildcard
-  session.allow(`liveblocks:examples:*`, session.FULL_ACCESS);
-
-  // Authorize the user and return the result
-  const { body, status } = await session.authorize();
+  lbSession.allow(`liveblocks:examples:*`, lbSession.FULL_ACCESS);
+  const { body, status } = await lbSession.authorize();
   return new Response(body, { status });
 }
 
