@@ -31,8 +31,6 @@ graph TB
         LiveblocksAuthAPI[/api/liveblocks-auth]
         NextAuthAPI[/api/auth/nextauth]
         SignupAPI[/api/signup]
-        
-        AgentAPI --> |GPT-5 JSON Mode|OpenAIFallback[OpenAI / Heuristics]
     end
     
     subgraph "External Services"
