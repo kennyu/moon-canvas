@@ -29,7 +29,7 @@ export async function POST() {
     userInfo: {
       name: user.name,
       color,
-      ...(user.avatar ? { avatar: user.avatar } : {}),
+      avatar: user.avatar ?? "",
     },
   });
   lbSession.allow(`liveblocks:examples:*`, lbSession.FULL_ACCESS);

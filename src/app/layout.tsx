@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "../globals.css";
 import { Providers } from "./Providers";
 import { Suspense } from "react";
+import AuthBar from "@/components/AuthBar";
 
 export const metadata: Metadata = {
   title: "Liveblocks",
@@ -37,7 +38,10 @@ export default function RootLayout({
       </head>
       <body>
         <Suspense>
-          <Providers>{children}</Providers>
+          <Providers>
+            <AuthBar />
+            {children}
+          </Providers>
         </Suspense>
       </body>
     </html>
