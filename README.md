@@ -27,10 +27,10 @@ graph TB
     end
     
     subgraph "Next.js API Routes"
-        AgentAPI[/api/canvas-agent]
-        LiveblocksAuthAPI[/api/liveblocks-auth]
-        NextAuthAPI[/api/auth/nextauth]
-        SignupAPI[/api/signup]
+        AgentAPI["/api/canvas-agent"]
+        LiveblocksAuthAPI["/api/liveblocks-auth"]
+        NextAuthAPI["/api/auth/nextauth"]
+        SignupAPI["/api/signup"]
     end
     
     subgraph "External Services"
