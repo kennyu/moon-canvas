@@ -8,7 +8,7 @@ import { Loading } from "@/components/Loading";
 
 export function Room({ children }: { children: ReactNode }) {
   const roomId = useExampleRoomId(
-    "liveblocks:examples:whiteboard-storage"
+    "liveblocks:examples:moon-canvas"
   );
 
   return (

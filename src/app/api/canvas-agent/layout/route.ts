@@ -139,7 +139,7 @@ export async function POST(req: NextRequest) {
     let result = layoutHeuristics(data);
     try {
       const res = await openai.chat.completions.create({
-        model: "gpt-5-mini",
+        model: "gpt-5",
         messages: [
           { role: "system", content: system },
           { role: "user", content: user },

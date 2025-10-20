@@ -30,7 +30,7 @@ export function ChatPanel() {
     if (!hasCreateIntent && !transform.hasTransformIntent && !layout.hasLayoutIntent) {
       setMessages((prev) => [
         ...prev,
-        { id: `${Date.now()}-a`, role: "assistant", text: "(note) No create/transform intent detected." },
+        { id: `${Date.now()}-a`, role: "assistant", text: "(note) No intent detected." },
       ]);
       return;
     }

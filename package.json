@@ -9,6 +9,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "agent:draw": "ts-node-esm scripts/agent-draw.ts",
+    "agent:repl": "ts-node-esm scripts/agent-repl.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {
@@ -32,6 +34,7 @@
   "devDependencies": {
     "@types/react": "^19.2.0",
     "prettier": "^3.3.2",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   }
 }
