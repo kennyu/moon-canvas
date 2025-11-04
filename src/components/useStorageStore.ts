@@ -74,6 +74,16 @@ export function useStorageStore({
         "initialize"
       );
 
+      // Dev logging: dump all shapes loaded into the canvas on initial sync
+      if (process.env.NODE_ENV !== "production") {
+        try {
+          const initial = [...liveRecords.values()];
+          const shapes = initial.filter((r: any) => r?.typeName === "shape");
+          // eslint-disable-next-line no-console
+          console.log("[sync] initial shapes", shapes.map((s: any) => ({ id: s?.id, type: s?.type, x: s?.x, y: s?.y, props: s?.props })));
+        } catch {}
+      }
+
       // Sync tldraw changes with Storage
       unsubs.push(
         store.listen(
@@ -169,6 +179,21 @@ export function useStorageStore({
                 store.put(toPut);
               }
             });
+
+            // Dev logging: dump shapes affected by storage→canvas sync
+            if (process.env.NODE_ENV !== "production") {
+              try {
+                const putShapes = (toPut as any[]).filter((r) => r?.typeName === "shape");
+                if (putShapes.length) {
+                  // eslint-disable-next-line no-console
+                  console.log("[sync] put shapes", putShapes.map((s: any) => ({ id: s?.id, type: s?.type, x: s?.x, y: s?.y, props: s?.props })));
+                }
+                if (toRemove.length) {
+                  // eslint-disable-next-line no-console
+                  console.log("[sync] removed ids", toRemove);
+                }
+              } catch {}
+            }
           },
           { isDeep: true }
         )

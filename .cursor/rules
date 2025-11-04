@@ -1,0 +1,17 @@
+# Cursor Rules
+
+## Terminal Configuration
+- Use Git Bash instead of PowerShell for all terminal commands
+- Default shell: bash
+
+## Project Context
+- This is a React + Next.js Project
+- Use npm for package management
+- Follow TypeScript best practices
+
+## Code Style
+- Use TypeScript for all new code
+- Follow React functional component patterns
+- Use proper TypeScript types and interfaces
+- Maintain consistent code formatting
+- Prefer to use TLDraw primitives first, over liveblock primitives
